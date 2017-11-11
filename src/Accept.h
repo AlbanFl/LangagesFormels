@@ -21,6 +21,10 @@ etatset_t Delta(const sAutoNDE& at, const etatset_t& e, symb_t c);
 
 bool Accept(const sAutoNDE& at, std::string str);
 
+///////////////////////////////////////////////////////////////////////////////
+
+bool Accepte_recurs(const sAutoNDE &at, etat_t etat, std::string str);			//Fonction récursive appelée par 
+
 //******************************************************************************
 #endif // ACCEPT_H
 //******************************************************************************
