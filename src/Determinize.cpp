@@ -17,6 +17,7 @@ sAutoNDE Determinize(const sAutoNDE& at){
   vector<set<etat_t> > nouveaux_etats;
   set<etat_t> initial;
   initial.insert(at.initial);
+  r.nb_finaux = 0;
   for(set<etat_t>::iterator i = initial.begin(); i != initial.end(); i++) {
     for(set<etat_t>::iterator it = at.epsilon[(*i)].begin(); it != at.epsilon[(*i)].end(); it++) {
       if(initial.find((*it)) == initial.end()) {
@@ -25,8 +26,13 @@ sAutoNDE Determinize(const sAutoNDE& at){
     }
   }
   nouveaux_etats.push_back(initial);
+  for(set<etat_t>::iterator it = initial.begin(); it != initial.end(); it++) {
+          if(at.finaux.find(*it) != at.finaux.end() && r.finaux.find(nouveaux_etats.size()-1) == r.finaux.end()){
+            r.finaux.insert(nouveaux_etats.size()-1);
+            r.nb_finaux++;
+          }
+        }
   bool est_nouveau = true;
-   r.nb_finaux = 0;
 
   for(unsigned int etat=0; etat<nouveaux_etats.size(); etat++) {
     for(unsigned int symb=0; symb<at.nb_symbs; symb++) {
@@ -80,8 +86,6 @@ sAutoNDE Determinize(const sAutoNDE& at){
   r.nb_etats = nouveaux_etats.size();
   r.initial = 0;
   r.nb_symbs = at.nb_symbs;
-  
-  cout << EstDeterministe(r) << endl;
 
   return r;
 }
