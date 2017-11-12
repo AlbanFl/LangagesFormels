@@ -26,9 +26,10 @@ sAutoNDE Determinize(const sAutoNDE& at){
   }
   nouveaux_etats.push_back(initial);
   bool est_nouveau = true;
+   r.nb_finaux = 0;
 
-  for(int etat=0; etat<nouveaux_etats.size(); etat++) {
-    for(int symb=0; symb<at.nb_symbs; symb++) {
+  for(unsigned int etat=0; etat<nouveaux_etats.size(); etat++) {
+    for(unsigned int symb=0; symb<at.nb_symbs; symb++) {
       set<etat_t> nouvel_etat;
       est_nouveau = true;
       for(set<etat_t>::iterator i = nouveaux_etats[etat].begin(); i != nouveaux_etats[etat].end(); i++) {
@@ -44,7 +45,8 @@ sAutoNDE Determinize(const sAutoNDE& at){
           }
         }
       }
-      int i = etat, check = 0;
+      int i = etat; 
+      unsigned int check = 0;
       while(est_nouveau && i>= 0 && nouvel_etat.size() > 0) {
         if(nouveaux_etats[i].size() == nouvel_etat.size()) {
           for(set<etat_t>::iterator it = nouvel_etat.begin(); it != nouvel_etat.end(); it++) {
@@ -78,6 +80,8 @@ sAutoNDE Determinize(const sAutoNDE& at){
   r.nb_etats = nouveaux_etats.size();
   r.initial = 0;
   r.nb_symbs = at.nb_symbs;
+  
+  cout << EstDeterministe(r) << endl;
 
   return r;
 }
