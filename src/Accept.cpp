@@ -13,14 +13,18 @@
 //Verifie seulement si c'est deterministe, pas si c'est complet
 bool EstDeterministe(const sAutoNDE &at) {
 	//TODO définir cette fonction
+	unsigned int cpt;
 	for(size_t i = 0 ; i < at.trans.size() ; i++){
+		cpt = 0;
 		for(size_t j = 0 ; j < at.trans[i].size() ; j++){
-			if(at.trans[i][j].size() > 1){
+			if(at.trans[i][j].size() > 1)
 				return false;
-			}
+			else if(at.trans[i][j].size() == 1)
+				cpt ++;
 		}
+		if(cpt != at.nb_symbs)
+			return false;
 	}
-
 
 	for(size_t k = 0 ; k < at.epsilon.size() ; k++){
 		if(at.epsilon[k].size() > 0)
@@ -60,12 +64,10 @@ bool Accept(const sAutoNDE &at, std::string str) {
 	if(str.size() < 1)
 		return true;
 	return Accepte_recurs(at, at.initial, str);
-
 }
 
 bool Accepte_recurs(const sAutoNDE &at, etat_t etat, std::string str){
 	//si le mot en parametre est vide, on a réussi a recreer le mot passe en entree a partir du graphe
-	std::cout << etat << std::endl;
 	if(str.size() < 1){
 		for(etatset_t::iterator it = at.finaux.begin(); it != at.finaux.end() ; it++){
 			// si l'état actuel est un état final : vrai. Sinon, faux.
@@ -113,18 +115,8 @@ bool Accepte_recurs(const sAutoNDE &at, etat_t etat, std::string str){
 	}
 	//si la fonction n'a jamais pu renvoyer true, c'est que le mot n'existe pas
 	return false;
-	
-		
 
 }
 
 //******************************************************************************
-
-
-
-
-
-
-
-
 
