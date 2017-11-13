@@ -17,6 +17,8 @@ sAutoNDE Determinize(const sAutoNDE& at){
   set<etat_t> initial;
   initial.insert(at.initial); 
   r.nb_finaux = 0;
+  vector<set<etat_t> > eps;
+  r.epsilon = eps;
   for(set<etat_t>::iterator i = initial.begin(); i != initial.end(); i++) {
     for(set<etat_t>::iterator it = at.epsilon[(*i)].begin(); it != at.epsilon[(*i)].end(); it++) {
      ///Ces 2 boucles imbriquées permettent de trouver tous les états qu'on peut atteindre à partir de l'état initial avec que des liaisons epsilon.
@@ -35,6 +37,9 @@ sAutoNDE Determinize(const sAutoNDE& at){
   bool est_nouveau = true;
 
   for(unsigned int etat=0; etat<nouveaux_etats.size(); etat++) { ///pour chaque nouvel état...
+    vector<set<etat_t> > sym;
+    sym.resize(at.nb_symbs);
+    r.trans.push_back(sym);
     for(unsigned int symb=0; symb<at.nb_symbs; symb++) { ///...pour chaque symbole...
       set<etat_t> nouvel_etat;
       est_nouveau = true;
@@ -67,9 +72,6 @@ sAutoNDE Determinize(const sAutoNDE& at){
         if(est_nouveau)
           i--;
       }
-      vector<set<etat_t> > sym;
-      sym.resize(at.nb_symbs);
-      r.trans.push_back(sym);
       if(est_nouveau && nouvel_etat.size() > 0) { ///insère le set d'éléments aux éléments du graphe déterministe si il est nouveau
         nouveaux_etats.push_back(nouvel_etat);
         r.trans[etat][symb].insert(nouveaux_etats.size()-1);
