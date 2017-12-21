@@ -77,8 +77,10 @@ bool Accepte_recurs(const sAutoNDE &at, etat_t etat, std::string str){
 		return false;
 	}
 	//on recupere le symbole entre en parametre
-	int symbl = (int)(str[0]);
+	unsigned int symbl = (int)(str[0]);
 	symbl = symbl - ASCII_A;
+	if(symbl > at.nb_symbs-1)
+		return false;
 	
 	//On fait la fermeture a partir de l'etat actuel et du symbole voulu
 	etatset_t suivants;
