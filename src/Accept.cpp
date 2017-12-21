@@ -61,8 +61,6 @@ etatset_t Delta(const sAutoNDE &at, const etatset_t &e, symb_t c) {
 
 bool Accept(const sAutoNDE &at, std::string str) {
 	//TODO définir cette fonction
-	if(str.size() < 1)
-		return true;
 	return Accepte_recurs(at, at.initial, str);
 }
 
@@ -70,10 +68,17 @@ bool Accepte_recurs(const sAutoNDE &at, etat_t etat, std::string str){
 	//si le mot en parametre est vide, on a réussi a recreer le mot passe en entree a partir du graphe
 	if(str.size() < 1){
 		for(etatset_t::iterator it = at.finaux.begin(); it != at.finaux.end() ; it++){
-			// si l'état actuel est un état final : vrai. Sinon, faux.
+			// si l'état actuel est un état final
 			if(etat == *it)
 				return true;
 		}
+		// si on peut aller vers un autre état avec une transition epsilon, on relance depuis le nouvel état
+		for(etatset_t::iterator iteps = at.epsilon[etat].begin(); iteps != at.epsilon[etat].end(); iteps++){
+			if(Accepte_recurs(at, *iteps, str)){
+				return true;
+			}
+		}
+		//sinon, on retourne faux
 		return false;
 	}
 	//on recupere le symbole entre en parametre
