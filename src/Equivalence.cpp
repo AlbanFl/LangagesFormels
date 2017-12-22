@@ -72,6 +72,10 @@ std::string Automate2ExpressionRationnelle(sAutoNDE at){
 	at2.initial = 0;
 	
 	ToGraph(at2, "./test_apres.txt");
+	
+	/*********************** TROUVER L'EXPRESSION RATIONNELLE ***********************/
+	
+	
 	return sr;
 }
 
