@@ -2,11 +2,13 @@
 
 #include <iostream>
 #include <cassert>
+#include <string.h>
 
 #include "Equivalence.h"
 #include "Accept.h"
 #include "Minimize.h"
 #include "ToGraph.h"
+#include "Determinize.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -15,70 +17,101 @@ using namespace std;
 std::string Automate2ExpressionRationnelle(sAutoNDE at){
   //TODO définir cette fonction
 
-	std::string sr ="aa";
+	std::string sr;
 	
-	ToGraph(at, "./test2.txt");
+	/*********************** REARANGEMENT DE L'AUTOMATE (FONCTIONNEL) ***********************/
 	
-	/*********************** REARANGEMENT DE L'AUTOMATE ***********************/
+	sAutoNDE at2 = Determinize(at);
 	
 	//on push de nouveaux etats vides dans epsilon et trans
 	std::vector<std::set<etat_t>> nouveau;
 	std::vector<std::set<etat_t>> ancien;
-	at.trans.push_back(nouveau);
-	at.trans.push_back(nouveau);
+	at2.trans.push_back(nouveau);
+	at2.trans.push_back(nouveau);
 	std::set<etat_t> nouveau_eps;
-	std::set<etat_t> ancien_eps;
-	at.epsilon.push_back(nouveau_eps);
-	at.epsilon.push_back(nouveau_eps);
+	at2.epsilon.push_back(nouveau_eps);
+	at2.epsilon.push_back(nouveau_eps);
 	
 	//On avance tous les etats d'une "case" dans trans
 	std::set<etat_t> nouveau_set;
 	
-	for(size_t i = 0 ; i < at.trans.size() ; i++){
-		for(size_t j = 0; j < at.trans[i].size() ; j++){
-			for(etatset_t::iterator it = at.trans[i][j].begin(); it != at.trans[i][j].end() ; it++){
+	for(size_t i = 0 ; i < at2.trans.size() - 1 ; i++){
+		for(size_t j = 0; j < at2.trans[i].size() ; j++){
+			for(etatset_t::iterator it = at2.trans[i][j].begin(); it != at2.trans[i][j].end() ; it++){
 				nouveau_set.insert(*it + 1);
-				at.trans[i][j].erase(*it);
+				at2.trans[i][j].erase(*it);
 			}
 			for(etatset_t::iterator ite = nouveau_set.begin(); ite != nouveau_set.end() ; ite++){
-				at.trans[i][j].insert(*ite);
+				at2.trans[i][j].insert(*ite);
 				nouveau_set.erase(*ite);
 			}
 		}
 		
-		ancien = at.trans[i];
-		at.trans[i] = nouveau;
+		ancien = at2.trans[i];
+		at2.trans[i] = nouveau;
 		nouveau = ancien;
-		
-		for(etatset_t::iterator it = at.epsilon[i].begin(); it != at.epsilon[i].end() ; it++){
-			nouveau_set.insert(*it + 1);
-			at.epsilon[i].erase(*it);
-		}
-		for(etatset_t::iterator ite = nouveau_set.begin(); ite != nouveau_set.end() ; ite++){
-			at.epsilon[i].insert(*ite);
-			nouveau_set.erase(*ite);
-		}
-
-		ancien_eps = at.epsilon[i];
-		at.epsilon[i] = nouveau_eps;
-		nouveau_eps = ancien_eps;
 	}
 	
 	//Pour chaque etat final, on y fait une transition vers le dernier etat, et on le supprime de la liste des etats finaux
-	for(etatset_t::iterator it = at.finaux.begin(); it != at.finaux.end() ; it++){
-		at.epsilon[*it+1].insert(at.nb_etats + 1);
-		at.finaux.erase(*it);
+	for(etatset_t::iterator it = at2.finaux.begin(); it != at2.finaux.end() ; it++){
+		at2.epsilon[*it+1].insert(at2.nb_etats + 1);
+		at2.finaux.erase(*it);
 	}
-	at.finaux.insert(at.nb_etats + 1);
-	at.nb_finaux = 1;
 	
-	at.nb_etats += 2;
+	//On insère le nouvel état final dans la liste des états finaux, et on passe à 1 le nb d'états finaux
+	at2.finaux.insert(at2.nb_etats + 1);
+	at2.nb_finaux = 1;
 	
-	at.epsilon[0].insert(at.initial + 1);
-	at.initial = 0;
+	//On ajoute 2 au nb d'états
+	at2.nb_etats += 2;
 	
-	ToGraph(at, "./test.txt");
-	std::cout << at.trans.size() << " et epsilon " << at.epsilon.size() << std::endl;
+	//On crée une transition epsilon de 0 vers l'ancien état initial, et on change l'état initial
+	at2.epsilon[0].insert(at2.initial + 1);
+	at2.initial = 0;
+	
+	/*********************** TROUVER L'EXPRESSION RATIONNELLE (NON FONCTIONNEL) ***********************/
+	
+	//tableau qui va se remplit peu à peu en regardant comment aller de l'etat 0 à l'etat voulu
+	string tab[at2.nb_etats + 1][at2.nb_etats + 1];
+	for(unsigned int i = 0 ; i <= at2.nb_etats ; i++){
+		for(unsigned int j = 0 ; j <= at2.nb_etats ; j++){
+			tab[i][j] = "";
+		}
+	}
+	string str_temp;
+	for(unsigned int etat = 1 ; etat < at2.nb_etats ; etat++){
+		str_temp = "";
+		for(unsigned int i = 1 ; i < at2.nb_etats ; i++){
+			if(at2.trans[etat][i].size() != 0){
+				for(etatset_t::iterator it = at2.trans[etat][i].begin(); it != at2.trans[etat][i].end() ; it++){
+					if(*it == etat){
+						if(str_temp == ""){
+							str_temp = (char)(i + ASCII_A);
+						}else{
+							str_temp = str_temp + "|" + (char)(i + ASCII_A);
+						}
+					}
+				}
+			}
+		}
+		tab[etat][etat] = "(" + str_temp + ")*";
+		str_temp = "";
+		for(unsigned int i = 1 ; i < at2.nb_etats ; i++){
+			if(at2.trans[etat][i].size() != 0){
+				for(etatset_t::iterator it = at2.trans[etat][i].begin(); it != at2.trans[etat][i].end() ; it++){
+					if(tab[etat][*it] == ""){
+						tab[etat][*it] = tab[etat][etat] + "." + (char)(i+ASCII_A);
+					}
+					else{	
+						tab[etat][*it] = tab[etat][*it] + "|" + tab[etat][etat] + "." + (char)(i+ASCII_A);
+					}
+				}
+			}
+		}
+	}
+	
+	sr = tab[0][at2.nb_etats-1];
+	
 	return sr;
 }
 

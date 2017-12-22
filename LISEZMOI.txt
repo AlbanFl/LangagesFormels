@@ -36,3 +36,6 @@ Pour utiliser la sortie graphique, utilisez le package graphviz https://doc.ubun
 
 Mettre ici les commentaires éventuels des étudiants.
 Tous les warnings, info résiduels doivent être justifiés ici.
+
+
+Fonction expression rationnelle : la réorganisation de l'automate est fonctionnelle, mais pas la suite de la fonction.
