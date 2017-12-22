@@ -1,4 +1,4 @@
-# (a U ab U aba)*
+﻿# (a U ab U aba)*
 3 2 1
 
 # état initial
