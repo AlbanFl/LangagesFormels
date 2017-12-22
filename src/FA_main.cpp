@@ -92,7 +92,7 @@ int main(int argc, char* argv[] ){
 	  nb_ofiles = 0;
           break;
         case 3: //min
-          expr = argv[++i];
+          in1 = argv[++i];
           out = argv[++i];
 	  nb_ifiles = 1;
 	  nb_ofiles = 1;

@@ -1,8 +1,8 @@
-Rendu du projet LIIFLC 2017-2018
+﻿Rendu du projet LIIFLC 2017-2018
 ================================
-
-BRANDON   Romuald   #123456
-THIEL     Sylvain   #456789
+FLANDIN   Alban	    #11504017
+GIRARD    Mihajlo   #11506391
+MAGNAGNA  Lucas	    #11503046
 
 Voir http://liris.cnrs.fr/sylvain.brandel/wiki/doku.php?id=ens:liflf:projet
 
