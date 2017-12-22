@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <string.h>
 
 #include "Equivalence.h"
 #include "Accept.h"
@@ -15,15 +16,11 @@ using namespace std;
 std::string Automate2ExpressionRationnelle(sAutoNDE at){
   //TODO définir cette fonction
 
-	std::string sr ="aa";
+	std::string sr;
 	
-	ToGraph(at, "./test_avant.txt");
-	/*********************** REARANGEMENT DE L'AUTOMATE ***********************/
-	std::cout << " lolilol " << std::endl;
+	/*********************** REARANGEMENT DE L'AUTOMATE (FONCTIONNEL) ***********************/
 	
 	sAutoNDE at2 = Determinize(at);
-	
-	std::cout << at2.trans.size() << " et epsilon " << at2.epsilon.size() << std::endl;
 	
 	//on push de nouveaux etats vides dans epsilon et trans
 	std::vector<std::set<etat_t>> nouveau;
@@ -71,10 +68,48 @@ std::string Automate2ExpressionRationnelle(sAutoNDE at){
 	at2.epsilon[0].insert(at2.initial + 1);
 	at2.initial = 0;
 	
-	ToGraph(at2, "./test_apres.txt");
+	/*********************** TROUVER L'EXPRESSION RATIONNELLE (NON FONCTIONNEL) ***********************/
 	
-	/*********************** TROUVER L'EXPRESSION RATIONNELLE ***********************/
+	//tableau qui va se remplit peu à peu en regardant comment aller de l'etat 0 à l'etat voulu
+	string tab[at2.nb_etats + 1][at2.nb_etats + 1];
+	for(unsigned int i = 0 ; i <= at2.nb_etats ; i++){
+		for(unsigned int j = 0 ; j <= at2.nb_etats ; j++){
+			tab[i][j] = "";
+		}
+	}
+	string str_temp;
+	for(unsigned int etat = 1 ; etat < at2.nb_etats ; etat++){
+		str_temp = "";
+		for(unsigned int i = 1 ; i < at2.nb_etats ; i++){
+			if(at2.trans[etat][i].size() != 0){
+				for(etatset_t::iterator it = at2.trans[etat][i].begin(); it != at2.trans[etat][i].end() ; it++){
+					if(*it == etat){
+						if(str_temp == ""){
+							str_temp = (char)(i + ASCII_A);
+						}else{
+							str_temp = str_temp + "|" + (char)(i + ASCII_A);
+						}
+					}
+				}
+			}
+		}
+		tab[etat][etat] = "(" + str_temp + ")*";
+		str_temp = "";
+		for(unsigned int i = 1 ; i < at2.nb_etats ; i++){
+			if(at2.trans[etat][i].size() != 0){
+				for(etatset_t::iterator it = at2.trans[etat][i].begin(); it != at2.trans[etat][i].end() ; it++){
+					if(tab[etat][*it] == ""){
+						tab[etat][*it] = tab[etat][etat] + "." + (char)(i+ASCII_A);
+					}
+					else{	
+						tab[etat][*it] = tab[etat][*it] + "|" + tab[etat][etat] + "." + (char)(i+ASCII_A);
+					}
+				}
+			}
+		}
+	}
 	
+	sr = tab[0][at2.nb_etats-1];
 	
 	return sr;
 }
